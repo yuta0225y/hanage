@@ -1,0 +1,16 @@
+version: '3'
+
+volumes:
+    node-modules:
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "12000:3000"
+    volumes:
+      - .:/app/
+      - node-modules:/app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+    command: npm run dev
