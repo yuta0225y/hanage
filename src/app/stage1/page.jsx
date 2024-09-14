@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from 'react'; // useEffectをインポート
 import Image from 'next/image';
 
