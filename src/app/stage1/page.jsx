@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-// 画像のURLを定義
 const cottonBudImage = '/cotton-bud.png';
 const noseImage = '/nose.png';
 
@@ -46,17 +45,16 @@ export default function Stage1() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-white relative">
-      {/* h1タグ */}
       <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>
 
       {/* 鼻の画像 */}
-      <div className="mb-16"> {/* 鼻の画像とh1の間に50px、綿棒と鼻の間に100px */}
+      <div className="mb-16"> {/* 鼻の画像とh1の間、綿棒と鼻の間の間隔調整 */}
         <Image
           src={noseImage}
           alt="Nose"
           width={200}
           height={200}
-          priority // LCPのための優先度指定
+          priority
         />
       </div>
 
