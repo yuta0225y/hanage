@@ -7,7 +7,7 @@ export default function Home() {
         <h1 className="text-9xl mb-8">毛</h1>
 
         <Link href="/stage1" className="text-2xl text-blue-500 hover:underline">
-           Let's Play
+          Let&apos;s Play
         </Link>
       </div>
     </div>
