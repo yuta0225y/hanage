@@ -105,7 +105,9 @@ export default function Stage1() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white relative">
+    <div className="flex flex-col items-center justify-center h-screen bg-white relative"
+    onClick={handleTouch}
+    >
       <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>
       <p className="text-2xl">{status}</p> {/* 成功/失敗メッセージを表示 */}
 
