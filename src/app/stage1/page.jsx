@@ -13,8 +13,8 @@ export default function Stage1() {
   useEffect(() => {
     const moveInterval = 100; // 移動の間隔（ミリ秒）
     const step = 5; // 1回の移動量（ピクセル）
-    const minX = -100; // 中央から左に125ピクセル
-    const maxX = 100;  // 中央から右に125ピクセル
+    const minX = -80; // 中央から左いく距離
+    const maxX = 80;  // 中央から右に行く距離
 
     const handleMovement = () => {
       setPositionX((prevX) => {
@@ -40,7 +40,7 @@ export default function Stage1() {
 
   // 綿棒をクリックしたらY軸の上に移動
   const handleTouch = () => {
-    setPositionY((prev) => prev - 125); // Y軸を上に移動
+    setPositionY((prev) => prev - 115); // Y軸を上に移動
   };
 
   return (
@@ -48,7 +48,7 @@ export default function Stage1() {
       <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>
 
       {/* 鼻の画像 */}
-      <div className="mb-16"> {/* 鼻の画像とh1の間、綿棒と鼻の間の間隔調整 */}
+      <div className="mb-16 z-10"> {/* 鼻の画像とh1の間、綿棒と鼻の間の間隔調整 */}
         <Image
           src={noseImage}
           alt="Nose"
@@ -60,6 +60,7 @@ export default function Stage1() {
 
       {/* 綿棒の画像 */}
       <div
+       className="relative z-0"
         style={{
           transform: `translateX(${positionX}px) translateY(${positionY}px)`,
         }}
