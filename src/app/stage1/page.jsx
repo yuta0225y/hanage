@@ -14,6 +14,7 @@ export default function Stage1() {
   const [noseRect, setNoseRect] = useState(null); // 鼻の座標範囲
   const [rightNoseHole, setRightNoseHole] = useState(null); // 右の鼻の穴の範囲
   const [leftNoseHole, setLeftNoseHole] = useState(null); // 左の鼻の穴の範囲
+  const [imageLoaded, setImageLoaded] = useState(false); // 画像がロードされたかどうか
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
@@ -50,7 +51,7 @@ export default function Stage1() {
 
   // 鼻の位置情報を取得し、鼻の穴の範囲を計算する
   useEffect(() => {
-    if (noseRef.current) {
+    if (imageLoaded && noseRef.current) {
       const noseRect = noseRef.current.getBoundingClientRect();
       setNoseRect(noseRect);
 
@@ -61,7 +62,7 @@ export default function Stage1() {
       setRightNoseHole(rightNoseHole);
       setLeftNoseHole(leftNoseHole);
     }
-  }, []);
+  }, [imageLoaded]); // 画像がロードされた後に計算を行う
 
   // 綿棒の衝突判定
   useEffect(() => {
@@ -77,12 +78,7 @@ export default function Stage1() {
       // 綿棒の最上部位置を計算
       const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2; // X座標の中心
       const cottonBudTopY = cottonBudRect.top; // Y座標の最上部
-  
-      // 鼻の穴の範囲をコンソールに出力
-      console.log('綿棒の座標:', { x: cottonBudTopX, y: cottonBudTopY });
-      console.log('右の鼻の穴:', rightNoseHole);
-      console.log('左の鼻の穴:', leftNoseHole);
-  
+
       const isInRightNoseHole =
         cottonBudTopX >= rightNoseHole.x1 &&
         cottonBudTopX <= rightNoseHole.x2 &&
@@ -94,10 +90,7 @@ export default function Stage1() {
         cottonBudTopX <= leftNoseHole.x2 &&
         cottonBudTopY >= leftNoseHole.y1 &&
         cottonBudTopY <= leftNoseHole.y2;
-  
-      console.log('isInRightNoseHole:', isInRightNoseHole);
-      console.log('isInLeftNoseHole:', isInLeftNoseHole);
-  
+
       if (isInRightNoseHole || isInLeftNoseHole) {
         setStatus('成功！');
       } else {
@@ -108,22 +101,10 @@ export default function Stage1() {
   
   const handleTouch = () => {
     if (!clicked) {
-      if (cottonBudRef.current) {
-        const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-      }
-      
       setPositionY((prev) => prev - 115);
       setClicked(true);
     }
   };
-
-  useEffect(() => {
-    if (clicked) {
-      if (cottonBudRef.current) {
-        const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-      }
-    }
-  }, [positionY, clicked]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-white relative" onClick={handleTouch}>
@@ -131,35 +112,14 @@ export default function Stage1() {
       <p className="text-2xl">{status}</p>
 
       <div className="mb-16 z-10 relative" ref={noseRef}>
-        <Image src={noseImage} alt="Nose" width={200} height={200} priority />
-        
-        {/* デバッグ用に鼻の穴の範囲を表示 */}
-        {rightNoseHole && (
-          <div
-            style={{
-              position: 'absolute',
-              top: `${rightNoseHole.y1 - noseRect.top}px`,
-              left: `${rightNoseHole.x1 - noseRect.left}px`,
-              width: `${rightNoseHole.x2 - rightNoseHole.x1}px`,
-              height: `${rightNoseHole.y2 - rightNoseHole.y1}px`,
-              backgroundColor: 'rgba(255, 0, 0, 0.3)',
-              zIndex: 1000,
-            }}
-          ></div>
-        )}
-        {leftNoseHole && (
-          <div
-            style={{
-              position: 'absolute',
-              top: `${leftNoseHole.y1 - noseRect.top}px`,
-              left: `${leftNoseHole.x1 - noseRect.left}px`,
-              width: `${leftNoseHole.x2 - leftNoseHole.x1}px`,
-              height: `${leftNoseHole.y2 - leftNoseHole.y1}px`,
-              backgroundColor: 'rgba(0, 0, 255, 0.3)',
-              zIndex: 1000,
-            }}
-          ></div>
-        )}
+        <Image 
+          src={noseImage} 
+          alt="Nose" 
+          width={200} 
+          height={200} 
+          priority 
+          onLoad={() => setImageLoaded(true)} // 画像のロード完了を監視
+        />
       </div>
 
       <div
