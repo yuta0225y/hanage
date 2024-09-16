@@ -77,6 +77,11 @@ export default function Stage1() {
       // 綿棒の最上部位置を計算
       const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2; // X座標の中心
       const cottonBudTopY = cottonBudRect.top; // Y座標の最上部
+      // 綿棒の最下部位置を計算
+      const cottonBudBottomY = cottonBudRect.bottom; // Y座標の最下部
+
+      console.log('Cotton Bud Top:', { x: cottonBudTopX, y: cottonBudTopY });
+      console.log('Cotton Bud Bottom:', { x: cottonBudTopX, y: cottonBudBottomY });
 
       const isInRightNoseHole =
         cottonBudTopX >= rightNoseHole.x1 &&
@@ -100,10 +105,28 @@ export default function Stage1() {
 
   const handleTouch = () => {
     if (!clicked) {
+      console.log('Cotton Bud Position Before Change:');
+      if (cottonBudRef.current) {
+        const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
+        const cottonBudBottomY = cottonBudRect.bottom; // Y軸の最下部
+        console.log('Before:', { x: cottonBudRect.left + cottonBudRect.width / 2, y: cottonBudBottomY });
+      }
+      
       setPositionY((prev) => prev - 115);
       setClicked(true);
     }
   };
+
+  useEffect(() => {
+    if (clicked) {
+      console.log('Cotton Bud Position After Change:');
+      if (cottonBudRef.current) {
+        const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
+        const cottonBudBottomY = cottonBudRect.bottom; // Y軸の最下部
+        console.log('After:', { x: cottonBudRect.left + cottonBudRect.width / 2, y: cottonBudBottomY });
+      }
+    }
+  }, [positionY, clicked]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-white relative" onClick={handleTouch}>
