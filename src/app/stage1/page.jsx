@@ -15,13 +15,15 @@ export default function Stage1() {
   const [rightNoseHole, setRightNoseHole] = useState(null); // 右の鼻の穴の範囲
   const [leftNoseHole, setLeftNoseHole] = useState(null); // 左の鼻の穴の範囲
   const [imageLoaded, setImageLoaded] = useState(false); // 画像がロードされたかどうか
+  const [resetting, setResetting] = useState(false); // 成功後にリセット中かどうか
+  const [isSuccess, setIsSuccess] = useState(false); // 成功判定が固定されたかどうか
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
 
   // 綿棒の動き
   useEffect(() => {
-    if (!clicked) {
+    if (!clicked && !resetting) {
       const moveInterval = 100; // 移動の間隔（ミリ秒）
       const step = 5; // 1回の移動量（ピクセル）
       const minX = -130; // 中央から左に行く距離
@@ -47,7 +49,7 @@ export default function Stage1() {
 
       return () => clearInterval(intervalId);
     }
-  }, [direction, clicked]);
+  }, [direction, clicked, resetting]);
 
   // 鼻の位置情報を取得し、鼻の穴の範囲を計算する
   useEffect(() => {
@@ -72,6 +74,8 @@ export default function Stage1() {
   }, [positionX, positionY, clicked]);
 
   const checkCollision = () => {
+    if (isSuccess) return; // 一度成功したら判定を変えない
+
     if (cottonBudRef.current && noseRect && rightNoseHole && leftNoseHole) {
       const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
   
@@ -93,8 +97,11 @@ export default function Stage1() {
 
       if (isInRightNoseHole || isInLeftNoseHole) {
         setStatus('成功！');
+        setIsSuccess(true); // 成功判定を固定
+        handleReset();
       } else {
         setStatus('失敗。');
+        setClicked(true); // 失敗時にはクリック不可
       }
     }
   };
@@ -102,8 +109,38 @@ export default function Stage1() {
   const handleTouch = () => {
     if (!clicked) {
       setPositionY((prev) => prev - 115);
-      setClicked(true);
+      setClicked(true); // 一度クリックしたら再クリック不可
     }
+  };
+
+  // 成功した場合に綿棒をスタート地点に戻す
+  const handleReset = () => {
+    setResetting(true); // リセット中は動かない
+    const resetInterval = 100; // リセットの速度
+    const resetStep = 5; // 一度に戻るピクセル量
+
+    const resetMovement = () => {
+      setPositionY((prevY) => {
+        if (prevY < 0) {
+          return prevY + resetStep; // 徐々にY軸を戻す
+        } else {
+          clearInterval(resetId); // 戻りきったらリセット終了
+          setResetting(false);
+          return 0;
+        }
+      });
+      setPositionX((prevX) => {
+        if (prevX > 0) {
+          return prevX - resetStep; // X軸も戻す
+        } else if (prevX < 0) {
+          return prevX + resetStep;
+        } else {
+          return 0;
+        }
+      });
+    };
+
+    const resetId = setInterval(resetMovement, resetInterval);
   };
 
   return (
