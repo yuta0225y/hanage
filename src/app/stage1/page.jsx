@@ -73,28 +73,31 @@ export default function Stage1() {
   const checkCollision = () => {
     if (cottonBudRef.current && noseRect && rightNoseHole && leftNoseHole) {
       const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-
+  
       // 綿棒の最上部位置を計算
       const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2; // X座標の中心
       const cottonBudTopY = cottonBudRect.top; // Y座標の最上部
-      // 綿棒の最下部位置を計算
-      const cottonBudBottomY = cottonBudRect.bottom; // Y座標の最下部
-
-      console.log('Cotton Bud Top:', { x: cottonBudTopX, y: cottonBudTopY });
-      console.log('Cotton Bud Bottom:', { x: cottonBudTopX, y: cottonBudBottomY });
-
+  
+      // 鼻の穴の範囲をコンソールに出力
+      console.log('綿棒の座標:', { x: cottonBudTopX, y: cottonBudTopY });
+      console.log('右の鼻の穴:', rightNoseHole);
+      console.log('左の鼻の穴:', leftNoseHole);
+  
       const isInRightNoseHole =
         cottonBudTopX >= rightNoseHole.x1 &&
         cottonBudTopX <= rightNoseHole.x2 &&
         cottonBudTopY >= rightNoseHole.y1 &&
         cottonBudTopY <= rightNoseHole.y2;
-
+  
       const isInLeftNoseHole =
         cottonBudTopX >= leftNoseHole.x1 &&
         cottonBudTopX <= leftNoseHole.x2 &&
         cottonBudTopY >= leftNoseHole.y1 &&
         cottonBudTopY <= leftNoseHole.y2;
-
+  
+      console.log('isInRightNoseHole:', isInRightNoseHole);
+      console.log('isInLeftNoseHole:', isInLeftNoseHole);
+  
       if (isInRightNoseHole || isInLeftNoseHole) {
         setStatus('成功！');
       } else {
@@ -102,14 +105,11 @@ export default function Stage1() {
       }
     }
   };
-
+  
   const handleTouch = () => {
     if (!clicked) {
-      console.log('Cotton Bud Position Before Change:');
       if (cottonBudRef.current) {
         const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-        const cottonBudBottomY = cottonBudRect.bottom; // Y軸の最下部
-        console.log('Before:', { x: cottonBudRect.left + cottonBudRect.width / 2, y: cottonBudBottomY });
       }
       
       setPositionY((prev) => prev - 115);
@@ -119,11 +119,8 @@ export default function Stage1() {
 
   useEffect(() => {
     if (clicked) {
-      console.log('Cotton Bud Position After Change:');
       if (cottonBudRef.current) {
         const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-        const cottonBudBottomY = cottonBudRect.bottom; // Y軸の最下部
-        console.log('After:', { x: cottonBudRect.left + cottonBudRect.width / 2, y: cottonBudBottomY });
       }
     }
   }, [positionY, clicked]);
