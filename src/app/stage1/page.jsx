@@ -11,12 +11,15 @@ export default function Stage1() {
   const [direction, setDirection] = useState(1); // 移動方向（1: 右, -1: 左）
   const [status, setStatus] = useState(''); // 成功/失敗メッセージ
   const [clicked, setClicked] = useState(false); // 綿棒がクリックされたかどうか
+  const [noseRect, setNoseRect] = useState(null); // 鼻の座標範囲
+  const [rightNoseHole, setRightNoseHole] = useState(null); // 右の鼻の穴の範囲
+  const [leftNoseHole, setLeftNoseHole] = useState(null); // 左の鼻の穴の範囲
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
 
+  // 綿棒の動き
   useEffect(() => {
-    // 綿棒がクリックされていない場合のみ移動処理を実行
     if (!clicked) {
       const moveInterval = 100; // 移動の間隔（ミリ秒）
       const step = 5; // 1回の移動量（ピクセル）
@@ -45,6 +48,22 @@ export default function Stage1() {
     }
   }, [direction, clicked]);
 
+  // 鼻の位置情報を取得し、鼻の穴の範囲を計算する
+  useEffect(() => {
+    if (noseRef.current) {
+      const noseRect = noseRef.current.getBoundingClientRect();
+      setNoseRect(noseRect);
+
+      // 鼻の穴の相対座標を設定（ここで微調整可能）
+      const rightNoseHole = { x1: noseRect.left + 30, x2: noseRect.left + 90, y1: noseRect.top + 140, y2: noseRect.top + 200 };
+      const leftNoseHole = { x1: noseRect.left + 110, x2: noseRect.left + 170, y1: noseRect.top + 140, y2: noseRect.top + 200 };
+
+      setRightNoseHole(rightNoseHole);
+      setLeftNoseHole(leftNoseHole);
+    }
+  }, []);
+
+  // 綿棒の衝突判定
   useEffect(() => {
     if (clicked) {
       checkCollision();
@@ -52,42 +71,24 @@ export default function Stage1() {
   }, [positionX, positionY, clicked]);
 
   const checkCollision = () => {
-    if (cottonBudRef.current && noseRef.current) {
+    if (cottonBudRef.current && noseRect && rightNoseHole && leftNoseHole) {
       const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-      const noseRect = noseRef.current.getBoundingClientRect();
 
-      // 鼻の穴の範囲を設定
-      const rightNoseHole = { x1: -70, x2: -15, y: 70 }; // 右の鼻の穴
-      const leftNoseHole = { x1: 15, x2: 70, y: 70 }; // 左の鼻の穴
+      // 綿棒の最上部位置を計算
+      const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2; // X座標の中心
+      const cottonBudTopY = cottonBudRect.top; // Y座標の最上部
 
-      // 綿棒の位置とサイズを取得
-      const cottonBudCenterX = cottonBudRect.left + cottonBudRect.width / 2;
-      const cottonBudCenterY = cottonBudRect.top + cottonBudRect.height / 2;
-
-      // 鼻の穴の範囲を鼻の画像の位置に合わせて調整
-      const adjustedRightNoseHole = {
-        x1: noseRect.left + rightNoseHole.x1,
-        x2: noseRect.left + rightNoseHole.x2,
-        y: noseRect.top + rightNoseHole.y
-      };
-      const adjustedLeftNoseHole = {
-        x1: noseRect.left + leftNoseHole.x1,
-        x2: noseRect.left + leftNoseHole.x2,
-        y: noseRect.top + leftNoseHole.y
-      };
-
-      // 綿棒の中心位置が鼻の穴の範囲内にあるか確認
       const isInRightNoseHole =
-        cottonBudCenterX >= adjustedRightNoseHole.x1 &&
-        cottonBudCenterX <= adjustedRightNoseHole.x2 &&
-        cottonBudCenterY >= adjustedRightNoseHole.y - cottonBudRect.height / 2 &&
-        cottonBudCenterY <= adjustedRightNoseHole.y + cottonBudRect.height / 2;
+        cottonBudTopX >= rightNoseHole.x1 &&
+        cottonBudTopX <= rightNoseHole.x2 &&
+        cottonBudTopY >= rightNoseHole.y1 &&
+        cottonBudTopY <= rightNoseHole.y2;
 
       const isInLeftNoseHole =
-        cottonBudCenterX >= adjustedLeftNoseHole.x1 &&
-        cottonBudCenterX <= adjustedLeftNoseHole.x2 &&
-        cottonBudCenterY >= adjustedLeftNoseHole.y - cottonBudRect.height / 2 &&
-        cottonBudCenterY <= adjustedLeftNoseHole.y + cottonBudRect.height / 2;
+        cottonBudTopX >= leftNoseHole.x1 &&
+        cottonBudTopX <= leftNoseHole.x2 &&
+        cottonBudTopY >= leftNoseHole.y1 &&
+        cottonBudTopY <= leftNoseHole.y2;
 
       if (isInRightNoseHole || isInLeftNoseHole) {
         setStatus('成功！');
@@ -99,45 +100,55 @@ export default function Stage1() {
 
   const handleTouch = () => {
     if (!clicked) {
-      setPositionY((prev) => prev - 115); // Y軸を上に移動
-      setClicked(true); // クリックされたことを記録
+      setPositionY((prev) => prev - 115);
+      setClicked(true);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white relative"
-    onClick={handleTouch}
-    >
+    <div className="flex flex-col items-center justify-center h-screen bg-white relative" onClick={handleTouch}>
       <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>
-      <p className="text-2xl">{status}</p> {/* 成功/失敗メッセージを表示 */}
+      <p className="text-2xl">{status}</p>
 
-      {/* 鼻の画像 */}
-      <div className="mb-16 z-10" ref={noseRef}>
-        <Image
-          src={noseImage}
-          alt="Nose"
-          width={200}
-          height={200}
-          priority
-        />
+      <div className="mb-16 z-10 relative" ref={noseRef}>
+        <Image src={noseImage} alt="Nose" width={200} height={200} priority />
+        
+        {/* デバッグ用に鼻の穴の範囲を表示 */}
+        {rightNoseHole && (
+          <div
+            style={{
+              position: 'absolute',
+              top: `${rightNoseHole.y1 - noseRect.top}px`,
+              left: `${rightNoseHole.x1 - noseRect.left}px`,
+              width: `${rightNoseHole.x2 - rightNoseHole.x1}px`,
+              height: `${rightNoseHole.y2 - rightNoseHole.y1}px`,
+              backgroundColor: 'rgba(255, 0, 0, 0.3)',
+              zIndex: 1000,
+            }}
+          ></div>
+        )}
+        {leftNoseHole && (
+          <div
+            style={{
+              position: 'absolute',
+              top: `${leftNoseHole.y1 - noseRect.top}px`,
+              left: `${leftNoseHole.x1 - noseRect.left}px`,
+              width: `${leftNoseHole.x2 - leftNoseHole.x1}px`,
+              height: `${leftNoseHole.y2 - leftNoseHole.y1}px`,
+              backgroundColor: 'rgba(0, 0, 255, 0.3)',
+              zIndex: 1000,
+            }}
+          ></div>
+        )}
       </div>
 
-      {/* 綿棒の画像 */}
       <div
         className="relative z-0"
-        style={{
-          transform: `translateX(${positionX}px) translateY(${positionY}px)`,
-        }}
+        style={{ transform: `translateX(${positionX}px) translateY(${positionY}px)` }}
         ref={cottonBudRef}
-        onClick={handleTouch}
+        onClick={(e) => e.stopPropagation()} // 綿棒がクリックされたときのバブルを防ぐ
       >
-        <Image
-          src={cottonBudImage}
-          alt="Cotton Bud"
-          width={25}
-          height={50}
-          style={{ width: 'auto', height: 'auto' }}
-        />
+        <Image src={cottonBudImage} alt="Cotton Bud" width={25} height={50} style={{ width: 'auto', height: 'auto' }} />
       </div>
     </div>
   );
