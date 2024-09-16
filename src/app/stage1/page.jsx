@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 const cottonBudImage = '/cotton-bud.png';
 const noseImage = '/nose.png';
+const hairImage = '/ke.png';  // 毛の画像
 
 export default function Stage1() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
@@ -17,6 +18,7 @@ export default function Stage1() {
   const [imageLoaded, setImageLoaded] = useState(false); // 画像がロードされたかどうか
   const [resetting, setResetting] = useState(false); // 成功後にリセット中かどうか
   const [isSuccess, setIsSuccess] = useState(false); // 成功判定が固定されたかどうか
+  const [showHair, setShowHair] = useState(false); // 綿棒の先に毛を表示するか
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
@@ -88,7 +90,7 @@ export default function Stage1() {
         cottonBudTopX <= rightNoseHole.x2 &&
         cottonBudTopY >= rightNoseHole.y1 &&
         cottonBudTopY <= rightNoseHole.y2;
-  
+
       const isInLeftNoseHole =
         cottonBudTopX >= leftNoseHole.x1 &&
         cottonBudTopX <= leftNoseHole.x2 &&
@@ -98,14 +100,15 @@ export default function Stage1() {
       if (isInRightNoseHole || isInLeftNoseHole) {
         setStatus('成功！');
         setIsSuccess(true); // 成功判定を固定
-        handleReset();
+        setShowHair(true);  // 毛を表示する
+        handleReset(); // 綿棒を元の位置に戻す処理を呼び出す
       } else {
         setStatus('失敗。');
-        setClicked(true); // 失敗時にはクリック不可
+        setClicked(true); // 失敗時にはクリック不可にする
       }
     }
   };
-  
+
   const handleTouch = () => {
     if (!clicked) {
       setPositionY((prev) => prev - 115);
@@ -166,6 +169,13 @@ export default function Stage1() {
         onClick={(e) => e.stopPropagation()} // 綿棒がクリックされたときのバブルを防ぐ
       >
         <Image src={cottonBudImage} alt="Cotton Bud" width={25} height={50} style={{ width: 'auto', height: 'auto' }} />
+
+        {/* 毛の画像を綿棒の先端に重ねる */}
+        {showHair && (
+          <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '50px',}}>
+            <Image src={hairImage} alt="Hair" layout="fill" objectFit="cover" />
+          </div>
+        )}
       </div>
     </div>
   );
