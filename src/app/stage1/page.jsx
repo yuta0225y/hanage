@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const cottonBudImage = '/cotton-bud.png';
 const noseImage = '/nose.png';
-const hairImage = '/ke.png';  // 毛の画像
+const hairImage = '/ke.png'; // 毛の画像
 
 export default function Stage1() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
@@ -20,6 +20,8 @@ export default function Stage1() {
   const [isSuccess, setIsSuccess] = useState(false); // 成功判定が固定されたかどうか
   const [showHair, setShowHair] = useState(false); // 綿棒の先に毛を表示するか
   const [movementEnded, setMovementEnded] = useState(false); // 綿棒の動きが終わったかどうか
+  const [showExplosion, setShowExplosion] = useState(false); // Controls explosion animation display
+  const [animationCompleted, setAnimationCompleted] = useState(false); // Tracks if all animations are done
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
@@ -61,8 +63,18 @@ export default function Stage1() {
       setNoseRect(noseRect);
 
       // 鼻の穴の相対座標を設定（ここで微調整可能）
-      const rightNoseHole = { x1: noseRect.left + 30, x2: noseRect.left + 90, y1: noseRect.top + 140, y2: noseRect.top + 200 };
-      const leftNoseHole = { x1: noseRect.left + 110, x2: noseRect.left + 170, y1: noseRect.top + 140, y2: noseRect.top + 200 };
+      const rightNoseHole = { 
+        x1: noseRect.left + 30, 
+        x2: noseRect.left + 90, 
+        y1: noseRect.top + 140, 
+        y2: noseRect.top + 200 
+      };
+      const leftNoseHole = { 
+        x1: noseRect.left + 110, 
+        x2: noseRect.left + 170, 
+        y1: noseRect.top + 140, 
+        y2: noseRect.top + 200 
+      };
 
       setRightNoseHole(rightNoseHole);
       setLeftNoseHole(leftNoseHole);
@@ -83,14 +95,14 @@ export default function Stage1() {
   }, [positionX, positionY, clicked, movementEnded]);
 
   const checkCollision = () => {
-    if (isSuccess) return; // 一度成功したら判定を変えない
+    if (isSuccess || animationCompleted) return; // Prevent multiple triggers
 
     if (cottonBudRef.current && noseRect && rightNoseHole && leftNoseHole) {
       const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
 
-      // 綿棒の最上部位置を計算
-      const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2; // X座標の中心
-      const cottonBudTopY = cottonBudRect.top; // Y座標の最上部
+      // Calculate the top center position of the cotton bud
+      const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2;
+      const cottonBudTopY = cottonBudRect.top;
 
       const isInRightNoseHole =
         cottonBudTopX >= rightNoseHole.x1 &&
@@ -105,31 +117,46 @@ export default function Stage1() {
         cottonBudTopY <= leftNoseHole.y2;
 
       if (isInRightNoseHole || isInLeftNoseHole) {
+        // **Success Scenario**
         setStatus('Oh,Yeah!');
-        setIsSuccess(true); // 成功判定を固定
-        setShowHair(true);  // 毛を表示する
-        handleReset(); // 綿棒を元の位置に戻す処理を呼び出す
+        setIsSuccess(true); // Mark as success
+        setShowHair(true); // Display hair
+
+        // Reset cotton bud's position
+        handleReset();
+
+        // After reset, show share button
+        setTimeout(() => {
+          setAnimationCompleted(true);
+        }, 1000); // Adjust the timeout as needed based on reset duration
       } else {
+        // **Failure Scenario**
         setStatus('Oh my god...');
-        setClicked(true); // 失敗時にはクリック不可にする
+        setShowExplosion(true); // Trigger explosion animation
+
+        // After explosion animation, show share button
+        setTimeout(() => {
+          setShowExplosion(false); // Hide explosion
+          setAnimationCompleted(true);
+        }, 1000); // Duration of explosion animation
       }
     }
   };
 
   const handleTouch = () => {
-    if (!clicked) {
-      setClicked(true); // 一度クリックしたら再クリック不可
-      const moveUpInterval = 50; // 上に移動する間隔（ミリ秒）
-      const moveUpStep = 15; // 一度に上に進むピクセル数
-      const totalMoveUp = 115; // 全体で上に進むピクセル数
-      let movedUp = 0; // これまでに上に進んだピクセル数
+    if (!clicked && !animationCompleted) { // Prevent clicking during animations
+      setClicked(true); // Disable further clicks
+      const moveUpInterval = 50; // Movement interval in ms
+      const moveUpStep = 15; // Pixels to move up each step
+      const totalMoveUp = 115; // Total pixels to move up
+      let movedUp = 0; // Pixels moved up so far
 
       const moveUp = () => {
         setPositionY((prev) => prev - moveUpStep);
         movedUp += moveUpStep;
         if (movedUp >= totalMoveUp) {
           clearInterval(moveUpId);
-          setMovementEnded(true); // 動きが終わったことを通知
+          setMovementEnded(true); // Notify that movement has ended
         }
       };
 
@@ -139,25 +166,25 @@ export default function Stage1() {
 
   // 成功した場合に綿棒をスタート地点に戻す
   const handleReset = () => {
-    setResetting(true); // リセット中は動かない
-    const resetInterval = 100; // リセットの速度
-    const resetStep = 5; // 一度に戻るピクセル量
+    setResetting(true); // Prevent movement during reset
+    const resetInterval = 100; // Reset speed
+    const resetStep = 5; // Pixels to reset each step
 
     const resetMovement = () => {
       setPositionY((prevY) => {
-        if (prevY < -25) { // -50pxになるまでリセット
+        if (prevY < -25) { // Adjusted reset target
           return prevY + resetStep;
         } else {
-          clearInterval(resetId); // 戻りきったらリセット終了
+          clearInterval(resetId); // Reset complete
           setResetting(false);
-          return -25; // 50px上の位置
+          return -25; // Final reset position
         }
       });
       setPositionX((prevX) => {
         if (prevX > 0) {
-          return prevX - resetStep; // X軸も戻す
+          return prevX - resetStep; // Move left
         } else if (prevX < 0) {
-          return prevX + resetStep;
+          return prevX + resetStep; // Move right
         } else {
           return 0;
         }
@@ -168,10 +195,14 @@ export default function Stage1() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white relative" onClick={handleTouch}>
-      {/*<h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>*/}
-      <p className="text-2xl">{status}</p>
+    <div
+      className="flex flex-col items-center justify-center h-screen bg-white relative"
+      onClick={handleTouch}
+    >
+      {/* Status Message */}
+      <p className="text-2xl mb-4">{status}</p>
 
+      {/* Nose Image */}
       <div className="mb-16 z-10 relative" ref={noseRef}>
         <Image
           src={noseImage}
@@ -179,25 +210,79 @@ export default function Stage1() {
           width={200}
           height={200}
           priority
-          onLoad={() => setImageLoaded(true)} // 画像のロード完了を監視
+          onLoad={() => setImageLoaded(true)} // Monitor image load
         />
       </div>
 
+      {/* Explosion Animation */}
+      {showExplosion && (
+        <div className="explosion-animation absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <Image src="/explosion.gif" alt="Explosion" width={200} height={200} />
+        </div>
+      )}
+
+      {/* Cotton Bud */}
       <div
         className="relative z-0"
-        style={{ transform: `translateX(${positionX}px) translateY(${positionY}px)` }}
+        style={{
+          transform: `translateX(${positionX}px) translateY(${positionY}px)`,
+          transition: 'transform 0.1s linear', // Smooth movement
+        }}
         ref={cottonBudRef}
-        onClick={(e) => e.stopPropagation()} // 綿棒がクリックされたときのバブルを防ぐ
+        onClick={(e) => e.stopPropagation()} // Prevent event bubbling
       >
-        <Image src={cottonBudImage} alt="Cotton Bud" width={25} height={50} style={{ width: 'auto', height: 'auto' }} />
+        <Image
+          src={cottonBudImage}
+          alt="Cotton Bud"
+          width={25}
+          height={50}
+          style={{ width: 'auto', height: 'auto' }}
+        />
 
-        {/* 毛の画像を綿棒の先端に重ねる */}
+        {/* Hair Image */}
         {showHair && (
-          <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '50px',}}>
-            <Image src={hairImage} alt="Hair" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" style={{ objectFit: 'cover' }} />
+          <div
+            style={{
+              position: 'absolute',
+              top: '0px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '100px',
+              height: '50px',
+            }}
+          >
+            <Image
+              src={hairImage}
+              alt="Hair"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: 'cover' }}
+            />
           </div>
         )}
       </div>
+
+      {/* X Share Button Overlay */}
+      {animationCompleted && (
+        <div className="overlay fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
+          <p className="message text-4xl mb-4">
+            {isSuccess ? '成功！' : '失敗。'}
+          </p>
+          <a
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+              isSuccess
+                ? '綿棒で鼻毛を抜くのに成功しました！'
+                : '綿棒で鼻毛を抜くのに失敗しました。'
+            )}&url=${encodeURIComponent(window.location.href)}`} // Use current URL
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <button className="share-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">
+              Xでシェアする
+            </button>
+          </a>
+        </div>
+      )}
     </div>
   );
 }
