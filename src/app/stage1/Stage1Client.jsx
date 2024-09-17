@@ -84,17 +84,17 @@ export default function Stage1Client() {
       setNoseRect(noseRect);
 
       // 鼻の穴の相対座標を設定（ここで微調整可能）
-      const rightNoseHole = { 
-        x1: noseRect.left + 30, 
-        x2: noseRect.left + 90, 
-        y1: noseRect.top + 140, 
-        y2: noseRect.top + 200 
+      const rightNoseHole = {
+        x1: noseRect.left + 30,
+        x2: noseRect.left + 90,
+        y1: noseRect.top + 140,
+        y2: noseRect.top + 200
       };
-      const leftNoseHole = { 
-        x1: noseRect.left + 110, 
-        x2: noseRect.left + 170, 
-        y1: noseRect.top + 140, 
-        y2: noseRect.top + 200 
+      const leftNoseHole = {
+        x1: noseRect.left + 110,
+        x2: noseRect.left + 170,
+        y1: noseRect.top + 140,
+        y2: noseRect.top + 200
       };
 
       setRightNoseHole(rightNoseHole);
