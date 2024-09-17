@@ -19,6 +19,7 @@ export default function Stage1() {
   const [resetting, setResetting] = useState(false); // 成功後にリセット中かどうか
   const [isSuccess, setIsSuccess] = useState(false); // 成功判定が固定されたかどうか
   const [showHair, setShowHair] = useState(false); // 綿棒の先に毛を表示するか
+  const [movementEnded, setMovementEnded] = useState(false); // 綿棒の動きが終わったかどうか
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
@@ -70,17 +71,23 @@ export default function Stage1() {
 
   // 綿棒の衝突判定
   useEffect(() => {
-    if (clicked) {
-      checkCollision();
+    if (clicked && movementEnded) {
+      // 動きが終わった後に0.5秒待機してから判定を行う
+      const waitTime = 500; // 待機時間（ミリ秒）
+      const timerId = setTimeout(() => {
+        checkCollision();
+      }, waitTime);
+
+      return () => clearTimeout(timerId);
     }
-  }, [positionX, positionY, clicked]);
+  }, [positionX, positionY, clicked, movementEnded]);
 
   const checkCollision = () => {
     if (isSuccess) return; // 一度成功したら判定を変えない
 
     if (cottonBudRef.current && noseRect && rightNoseHole && leftNoseHole) {
       const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
-  
+
       // 綿棒の最上部位置を計算
       const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2; // X座標の中心
       const cottonBudTopY = cottonBudRect.top; // Y座標の最上部
@@ -98,12 +105,12 @@ export default function Stage1() {
         cottonBudTopY <= leftNoseHole.y2;
 
       if (isInRightNoseHole || isInLeftNoseHole) {
-        // setStatus('成功！');
+        setStatus('Oh,Yeah!');
         setIsSuccess(true); // 成功判定を固定
         setShowHair(true);  // 毛を表示する
         handleReset(); // 綿棒を元の位置に戻す処理を呼び出す
       } else {
-        // setStatus('失敗。');
+        setStatus('Oh my god...');
         setClicked(true); // 失敗時にはクリック不可にする
       }
     }
@@ -112,20 +119,20 @@ export default function Stage1() {
   const handleTouch = () => {
     if (!clicked) {
       setClicked(true); // 一度クリックしたら再クリック不可
-  
       const moveUpInterval = 50; // 上に移動する間隔（ミリ秒）
       const moveUpStep = 15; // 一度に上に進むピクセル数
       const totalMoveUp = 115; // 全体で上に進むピクセル数
       let movedUp = 0; // これまでに上に進んだピクセル数
-  
+
       const moveUp = () => {
         setPositionY((prev) => prev - moveUpStep);
         movedUp += moveUpStep;
         if (movedUp >= totalMoveUp) {
           clearInterval(moveUpId);
+          setMovementEnded(true); // 動きが終わったことを通知
         }
       };
-  
+
       const moveUpId = setInterval(moveUp, moveUpInterval);
     }
   };
@@ -138,12 +145,12 @@ export default function Stage1() {
 
     const resetMovement = () => {
       setPositionY((prevY) => {
-        if (prevY < 0) {
-          return prevY + resetStep; // 徐々にY軸を戻す
+        if (prevY < -25) { // -50pxになるまでリセット
+          return prevY + resetStep;
         } else {
           clearInterval(resetId); // 戻りきったらリセット終了
           setResetting(false);
-          return 0;
+          return -25; // 50px上の位置
         }
       });
       setPositionX((prevX) => {
@@ -162,16 +169,16 @@ export default function Stage1() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-white relative" onClick={handleTouch}>
-      {/* <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1> */}
+      {/*<h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>*/}
       <p className="text-2xl">{status}</p>
 
       <div className="mb-16 z-10 relative" ref={noseRef}>
-        <Image 
-          src={noseImage} 
-          alt="Nose" 
-          width={200} 
-          height={200} 
-          priority 
+        <Image
+          src={noseImage}
+          alt="Nose"
+          width={200}
+          height={200}
+          priority
           onLoad={() => setImageLoaded(true)} // 画像のロード完了を監視
         />
       </div>
@@ -187,7 +194,7 @@ export default function Stage1() {
         {/* 毛の画像を綿棒の先端に重ねる */}
         {showHair && (
           <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '50px',}}>
-            <Image src={hairImage} alt="Hair" layout="fill" objectFit="cover" />
+            <Image src={hairImage} alt="Hair" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" style={{ objectFit: 'cover' }} />
           </div>
         )}
       </div>
