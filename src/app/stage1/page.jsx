@@ -20,8 +20,6 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '鼻毛ゲーム - 綿棒チャレンジ',
-    description: '綿棒を使って鼻の穴に挑戦！タイミングが鍵です。',
     images: ['/twitter-card.png'],
   },
 };
