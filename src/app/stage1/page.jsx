@@ -22,7 +22,7 @@ export default function Stage1() {
   const [movementEnded, setMovementEnded] = useState(false); // 綿棒の動きが終わったかどうか
   const [showExplosion, setShowExplosion] = useState(false); // 爆発アニメーションを表示するか
   const [animationCompleted, setAnimationCompleted] = useState(false); // すべてのアニメーションが完了したかどうかを追跡する
-  const [timeLeft, setTimeLeft] = useState(3); // 残り時間を追跡するための状態
+  const [timeLeft, setTimeLeft] = useState(0.5); // 残り時間を追跡するための状態
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
@@ -232,7 +232,7 @@ export default function Stage1() {
     setMovementEnded(false);
     setShowExplosion(false);
     setAnimationCompleted(false);
-    setTimeLeft(3); // タイマーをリセット
+    setTimeLeft(0.5); // タイマーをリセット
   };
 
   return (
@@ -258,7 +258,7 @@ export default function Stage1() {
           width={200}
           height={200}
           priority
-          onLoad={() => setImageLoaded(true)} // 画像のロードを監視
+          onLoad={() => setImageLoaded(true)} // 画像がロードされたら通知
         />
       </div>
 
@@ -320,7 +320,7 @@ export default function Stage1() {
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
                 '毛タクさん沢山ギブ'
-              )}&url=${encodeURIComponent(window.location.href)}`} // 現在のURLを使用
+              )}&url=${encodeURIComponent(window.location.href)}`} 
               target="_blank"
               rel="noopener noreferrer"
             >
