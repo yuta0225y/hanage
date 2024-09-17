@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 const cottonBudImage = '/cotton-bud.png';
 const noseImage = '/nose.png';
-const hairImage = '/ke.png'; 
+const hairImage = '/ke.png';
 
 export default function Stage1Client() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
@@ -70,7 +70,7 @@ export default function Stage1Client() {
       timerRef.current = setTimeout(() => {
         setShowExplosion(true);
         setAnimationCompleted(true);
-      }, 500); // 0.5秒後に爆発
+      }, 1000); // 0.5秒後に爆発
     }
 
     // クリーンアップ
