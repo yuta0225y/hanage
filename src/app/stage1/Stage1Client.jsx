@@ -323,7 +323,7 @@ export default function Stage1Client() {
           {isSuccess ? (
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                '毛沢山タクさんギブ #鼻毛エクスプロージョン #RUNTEQ祭'
+                '毛タクさん沢山アゲてくよ！！ #鼻毛エクスプロージョン #RUNTEQ祭'
               )}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} 
               target="_blank"
               rel="noopener noreferrer"
@@ -337,7 +337,7 @@ export default function Stage1Client() {
               onClick={handleRetry}
               className="retry-button bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded"
             >
-              毛ほしい？▷はい
+              毛ほしい？▷はい・いいえ
             </button>
           )}
         </div>
