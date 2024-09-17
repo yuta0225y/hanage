@@ -7,7 +7,7 @@ export const metadata = {
   openGraph: {
     title: '鼻毛ゲーム - 綿棒チャレンジ',
     description: '綿棒を使って鼻の穴に挑戦！タイミングが鍵です。',
-    url: 'https://yourdomain.com/stage1', // 実際のURLに置き換えてください
+    url: 'https://hanage.vercel.app/stage1', // 実際のURLに置き換えてください
     type: 'website',
     images: [
       {
