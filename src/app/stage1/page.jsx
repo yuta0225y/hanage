@@ -1,17 +1,12 @@
-// src/app/stage1/page.jsx
-
-// メタデータの設定
 export const metadata = {
-  title: '鼻毛ゲーム - 綿棒チャレンジ',
-  description: '綿棒を使って鼻の穴に挑戦！タイミングが鍵です。',
+  title: '',
+  description: '',
   openGraph: {
-    title: '鼻毛ゲーム - 綿棒チャレンジ',
-    description: '綿棒を使って鼻の穴に挑戦！タイミングが鍵です。',
-    url: 'https://hanage.vercel.app/stage1', // 実際のURLに置き換えてください
+    url: 'https://hanage.vercel.app/stage1',
     type: 'website',
     images: [
       {
-        url: '/ogp-image.png',
+        url: 'https://hanage.vercel.app/ogp-image.png',
         width: 1200,
         height: 630,
         alt: '鼻毛ゲーム OGP画像',
@@ -20,7 +15,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    images: ['/twitter-card.png'],
+    title: '',
+    description: '',
+    images: ['https://hanage.vercel.app/twitter-card.png'],
   },
 };
 
