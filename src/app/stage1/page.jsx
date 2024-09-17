@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const cottonBudImage = '/cotton-bud.png';
 const noseImage = '/nose.png';
-const hairImage = '/ke.png'; // 毛の画像
+const hairImage = '/ke.png'; // 鼻毛の画像
 
 export default function Stage1() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
@@ -18,21 +18,23 @@ export default function Stage1() {
   const [imageLoaded, setImageLoaded] = useState(false); // 画像がロードされたかどうか
   const [resetting, setResetting] = useState(false); // 成功後にリセット中かどうか
   const [isSuccess, setIsSuccess] = useState(false); // 成功判定が固定されたかどうか
-  const [showHair, setShowHair] = useState(false); // 綿棒の先に毛を表示するか
+  const [showHair, setShowHair] = useState(false); // 綿棒の先に鼻毛を表示するか
   const [movementEnded, setMovementEnded] = useState(false); // 綿棒の動きが終わったかどうか
-  const [showExplosion, setShowExplosion] = useState(false); // Controls explosion animation display
-  const [animationCompleted, setAnimationCompleted] = useState(false); // Tracks if all animations are done
+  const [showExplosion, setShowExplosion] = useState(false); // 爆発アニメーションを表示するか
+  const [animationCompleted, setAnimationCompleted] = useState(false); // すべてのアニメーションが完了したかどうかを追跡する
+  const [timeLeft, setTimeLeft] = useState(3); // 残り時間を追跡するための状態
 
   const noseRef = useRef(null);
   const cottonBudRef = useRef(null);
+  const timerRef = useRef(null); // タイマーを管理するためのRef
 
-  // 綿棒の動き
+  // 綿棒の動き（難易度を上げるために速度を速くしました）
   useEffect(() => {
     if (!clicked && !resetting) {
-      const moveInterval = 60; // 移動の間隔（ミリ秒）
-      const step = 7; // 1回の移動量（ピクセル）
-      const minX = -130; // 中央から左に行く距離
-      const maxX = 130;  // 中央から右に行く距離
+      const moveInterval = 30; // 移動の間隔（ミリ秒）
+      const step = 10; // 1回の移動量（ピクセル）
+      const minX = -200; // 中央から左に行く距離
+      const maxX = 200;  // 中央から右に行く距離
 
       const handleMovement = () => {
         setPositionX((prevX) => {
@@ -55,6 +57,27 @@ export default function Stage1() {
       return () => clearInterval(intervalId);
     }
   }, [direction, clicked, resetting]);
+
+  // 3秒以内にタップしないと爆発 & カウントダウンの表示
+  useEffect(() => {
+    if (!clicked && !animationCompleted) {
+      setTimeLeft(0.5); // タイマーをリセット
+
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timerRef.current);
+            setShowExplosion(true);
+            setAnimationCompleted(true);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timerRef.current);
+    }
+  }, [clicked, animationCompleted]);
 
   // 鼻の位置情報を取得し、鼻の穴の範囲を計算する
   useEffect(() => {
@@ -95,12 +118,12 @@ export default function Stage1() {
   }, [positionX, positionY, clicked, movementEnded]);
 
   const checkCollision = () => {
-    if (isSuccess || animationCompleted) return; // Prevent multiple triggers
+    if (isSuccess || animationCompleted) return; // 複数のトリガーを防止
 
     if (cottonBudRef.current && noseRect && rightNoseHole && leftNoseHole) {
       const cottonBudRect = cottonBudRef.current.getBoundingClientRect();
 
-      // Calculate the top center position of the cotton bud
+      // 綿棒の上部中心の位置を計算
       const cottonBudTopX = cottonBudRect.left + cottonBudRect.width / 2;
       const cottonBudTopY = cottonBudRect.top;
 
@@ -117,46 +140,48 @@ export default function Stage1() {
         cottonBudTopY <= leftNoseHole.y2;
 
       if (isInRightNoseHole || isInLeftNoseHole) {
-        // **Success Scenario**
-        setStatus('Oh,Yeah!');
-        setIsSuccess(true); // Mark as success
-        setShowHair(true); // Display hair
+        // **成功シナリオ**
+        setStatus('');
+        setIsSuccess(true); // 成功をマーク
+        setShowHair(true); // 鼻毛を表示
 
-        // Reset cotton bud's position
+        // 綿棒の位置をリセット
         handleReset();
 
-        // After reset, show share button
+        // リセット後、シェアボタンを表示
         setTimeout(() => {
           setAnimationCompleted(true);
-        }, 1000); // Adjust the timeout as needed based on reset duration
+        }, 1000); // リセットの時間に応じて調整
       } else {
-        // **Failure Scenario**
-        setStatus('Oh my god...');
-        setShowExplosion(true); // Trigger explosion animation
+        // **失敗シナリオ**
+        setStatus('');
+        setShowExplosion(true); // 爆発アニメーションを表示
 
-        // After explosion animation, show share button
+        // 爆発アニメーション後、リトライボタンを表示
         setTimeout(() => {
-          setShowExplosion(false); // Hide explosion
+          setShowExplosion(false); // 爆発を非表示
           setAnimationCompleted(true);
-        }, 1000); // Duration of explosion animation
+        }, 1000); // 爆発アニメーションの長さ
       }
     }
   };
 
   const handleTouch = () => {
-    if (!clicked && !animationCompleted) { // Prevent clicking during animations
-      setClicked(true); // Disable further clicks
-      const moveUpInterval = 50; // Movement interval in ms
-      const moveUpStep = 15; // Pixels to move up each step
-      const totalMoveUp = 115; // Total pixels to move up
-      let movedUp = 0; // Pixels moved up so far
+    if (!clicked && !animationCompleted) { // アニメーション中のクリックを防止
+      setClicked(true); // クリックを無効化
+      clearInterval(timerRef.current); // タイマーをクリア
+      setTimeLeft(0); // カウントダウンを0に設定
+      const moveUpInterval = 50; // 移動の間隔（ミリ秒）
+      const moveUpStep = 15; // 1回の移動量（ピクセル）
+      const totalMoveUp = 115; // 合計移動量（ピクセル）
+      let movedUp = 0; // 現在の移動量
 
       const moveUp = () => {
         setPositionY((prev) => prev - moveUpStep);
         movedUp += moveUpStep;
         if (movedUp >= totalMoveUp) {
           clearInterval(moveUpId);
-          setMovementEnded(true); // Notify that movement has ended
+          setMovementEnded(true); // 動きが終了したことを通知
         }
       };
 
@@ -166,25 +191,25 @@ export default function Stage1() {
 
   // 成功した場合に綿棒をスタート地点に戻す
   const handleReset = () => {
-    setResetting(true); // Prevent movement during reset
-    const resetInterval = 100; // Reset speed
-    const resetStep = 5; // Pixels to reset each step
+    setResetting(true); // リセット中の移動を防止
+    const resetInterval = 100; // リセット速度
+    const resetStep = 5; // 1回のリセット量（ピクセル）
 
     const resetMovement = () => {
       setPositionY((prevY) => {
-        if (prevY < -25) { // Adjusted reset target
+        if (prevY < -25) { // リセットのターゲットを調整
           return prevY + resetStep;
         } else {
-          clearInterval(resetId); // Reset complete
+          clearInterval(resetId); // リセット完了
           setResetting(false);
-          return -25; // Final reset position
+          return -25; // 最終リセット位置
         }
       });
       setPositionX((prevX) => {
         if (prevX > 0) {
-          return prevX - resetStep; // Move left
+          return prevX - resetStep; // 左に移動
         } else if (prevX < 0) {
-          return prevX + resetStep; // Move right
+          return prevX + resetStep; // 右に移動
         } else {
           return 0;
         }
@@ -194,93 +219,123 @@ export default function Stage1() {
     const resetId = setInterval(resetMovement, resetInterval);
   };
 
+  // リトライボタンが押されたときの処理
+  const handleRetry = () => {
+    setPositionX(0);
+    setPositionY(0);
+    setDirection(1);
+    setStatus('');
+    setClicked(false);
+    setResetting(false);
+    setIsSuccess(false);
+    setShowHair(false);
+    setMovementEnded(false);
+    setShowExplosion(false);
+    setAnimationCompleted(false);
+    setTimeLeft(3); // タイマーをリセット
+  };
+
   return (
     <div
       className="flex flex-col items-center justify-center h-screen bg-white relative"
       onClick={handleTouch}
     >
-      {/* Status Message */}
-      <p className="text-2xl mb-4">{status}</p>
-
-      {/* Nose Image */}
-      <div className="mb-16 z-10 relative" ref={noseRef}>
-        <Image
-          src={noseImage}
-          alt="Nose"
-          width={200}
-          height={200}
-          priority
-          onLoad={() => setImageLoaded(true)} // Monitor image load
-        />
-      </div>
-
-      {/* Explosion Animation */}
-      {showExplosion && (
-        <div className="explosion-animation absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <Image src="/explosion.gif" alt="Explosion" width={200} height={200} />
+      {/* カウントダウンタイマーの表示 */}
+      {!clicked && !animationCompleted && (
+        <div className="timer absolute top-4 right-4 text-4xl font-bold">
+          {timeLeft}
         </div>
       )}
 
-      {/* Cotton Bud */}
+      {/* ステータスメッセージ */}
+      <p className="text-2xl mb-4">{status}</p>
+
+      {/* 鼻の画像 */}
+      <div className="mb-16 z-10 relative" ref={noseRef}>
+        <Image
+          src={noseImage}
+          alt="鼻"
+          width={200}
+          height={200}
+          priority
+          onLoad={() => setImageLoaded(true)} // 画像のロードを監視
+        />
+      </div>
+
+      {/* 爆発アニメーション */}
+      {showExplosion && (
+        <div className="explosion-animation absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <Image src="/explosion.gif" alt="爆発" width={1000} height={1000} />
+        </div>
+      )}
+
+      {/* 綿棒 */}
       <div
         className="relative z-0"
         style={{
           transform: `translateX(${positionX}px) translateY(${positionY}px)`,
-          transition: 'transform 0.1s linear', // Smooth movement
+          transition: 'transform 0.1s linear', // スムーズな動き
         }}
         ref={cottonBudRef}
-        onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+        onClick={(e) => e.stopPropagation()} // イベントのバブリングを防止
       >
         <Image
           src={cottonBudImage}
-          alt="Cotton Bud"
+          alt="綿棒"
           width={25}
           height={50}
           style={{ width: 'auto', height: 'auto' }}
         />
 
-        {/* Hair Image */}
+        {/* 鼻毛の画像 */}
         {showHair && (
           <div
             style={{
               position: 'absolute',
-              top: '0px',
+              top: '-150px', // 位置を上にずらす
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '100px',
-              height: '50px',
+              width: '300px', // 幅を大きく
+              height: '300px', // 高さを大きく
             }}
           >
             <Image
               src={hairImage}
-              alt="Hair"
+              alt="鼻毛"
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'contain' }}
             />
           </div>
         )}
       </div>
 
-      {/* X Share Button Overlay */}
+      {/* リトライまたはシェアボタンのオーバーレイ */}
       {animationCompleted && (
         <div className="overlay fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
           <p className="message text-4xl mb-4">
-            {isSuccess ? '成功！' : '失敗。'}
+            {isSuccess ? '毛ほしい？はい' : 'きびしいって！'}
           </p>
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-              isSuccess
-                ? '綿棒で鼻毛を抜くのに成功しました！'
-                : '綿棒で鼻毛を抜くのに失敗しました。'
-            )}&url=${encodeURIComponent(window.location.href)}`} // Use current URL
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <button className="share-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">
-              Xでシェアする
+          {isSuccess ? (
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                '毛タクさん沢山ギブ'
+              )}&url=${encodeURIComponent(window.location.href)}`} // 現在のURLを使用
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="share-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">
+                毛をシェアする
+              </button>
+            </a>
+          ) : (
+            <button
+              onClick={handleRetry}
+              className="retry-button bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded"
+            >
+              毛ほしい？はい
             </button>
-          </a>
+          )}
         </div>
       )}
     </div>
