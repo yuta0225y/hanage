@@ -13,7 +13,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "",
+  title: "鼻毛エクスプロージョン",
   description: "",
 };
 
