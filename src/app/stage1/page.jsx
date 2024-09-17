@@ -8,7 +8,7 @@ const hairImage = '/ke.png';  // 毛の画像
 
 export default function Stage1() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
-  const [positionY, setPositionY] = useState(0); // 綿棒のY座標
+  const [positionY, setPositionY] = useState(50); // 綿棒のY座標
   const [direction, setDirection] = useState(1); // 移動方向（1: 右, -1: 左）
   const [status, setStatus] = useState(''); // 成功/失敗メッセージ
   const [clicked, setClicked] = useState(false); // 綿棒がクリックされたかどうか
@@ -26,8 +26,8 @@ export default function Stage1() {
   // 綿棒の動き
   useEffect(() => {
     if (!clicked && !resetting) {
-      const moveInterval = 100; // 移動の間隔（ミリ秒）
-      const step = 5; // 1回の移動量（ピクセル）
+      const moveInterval = 60; // 移動の間隔（ミリ秒）
+      const step = 7; // 1回の移動量（ピクセル）
       const minX = -130; // 中央から左に行く距離
       const maxX = 130;  // 中央から右に行く距離
 
@@ -98,12 +98,12 @@ export default function Stage1() {
         cottonBudTopY <= leftNoseHole.y2;
 
       if (isInRightNoseHole || isInLeftNoseHole) {
-        setStatus('成功！');
+        // setStatus('成功！');
         setIsSuccess(true); // 成功判定を固定
         setShowHair(true);  // 毛を表示する
         handleReset(); // 綿棒を元の位置に戻す処理を呼び出す
       } else {
-        setStatus('失敗。');
+        // setStatus('失敗。');
         setClicked(true); // 失敗時にはクリック不可にする
       }
     }
@@ -111,8 +111,22 @@ export default function Stage1() {
 
   const handleTouch = () => {
     if (!clicked) {
-      setPositionY((prev) => prev - 115);
       setClicked(true); // 一度クリックしたら再クリック不可
+  
+      const moveUpInterval = 50; // 上に移動する間隔（ミリ秒）
+      const moveUpStep = 15; // 一度に上に進むピクセル数
+      const totalMoveUp = 165; // 全体で上に進むピクセル数
+      let movedUp = 0; // これまでに上に進んだピクセル数
+  
+      const moveUp = () => {
+        setPositionY((prev) => prev - moveUpStep);
+        movedUp += moveUpStep;
+        if (movedUp >= totalMoveUp) {
+          clearInterval(moveUpId);
+        }
+      };
+  
+      const moveUpId = setInterval(moveUp, moveUpInterval);
     }
   };
 
@@ -148,7 +162,7 @@ export default function Stage1() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-white relative" onClick={handleTouch}>
-      <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1>
+      {/* <h1 className="text-5xl text-center mt-20 mb-8">いれろ！！</h1> */}
       <p className="text-2xl">{status}</p>
 
       <div className="mb-16 z-10 relative" ref={noseRef}>
