@@ -8,7 +8,7 @@ const hairImage = '/ke.png';  // 毛の画像
 
 export default function Stage1() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
-  const [positionY, setPositionY] = useState(50); // 綿棒のY座標
+  const [positionY, setPositionY] = useState(0); // 綿棒のY座標
   const [direction, setDirection] = useState(1); // 移動方向（1: 右, -1: 左）
   const [status, setStatus] = useState(''); // 成功/失敗メッセージ
   const [clicked, setClicked] = useState(false); // 綿棒がクリックされたかどうか
@@ -115,7 +115,7 @@ export default function Stage1() {
   
       const moveUpInterval = 50; // 上に移動する間隔（ミリ秒）
       const moveUpStep = 15; // 一度に上に進むピクセル数
-      const totalMoveUp = 165; // 全体で上に進むピクセル数
+      const totalMoveUp = 115; // 全体で上に進むピクセル数
       let movedUp = 0; // これまでに上に進んだピクセル数
   
       const moveUp = () => {
