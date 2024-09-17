@@ -149,7 +149,7 @@ export default function Stage1Client() {
         // リセット後、シェアボタンを表示
         setTimeout(() => {
           setAnimationCompleted(true);
-        }, 1000); // リセットの時間に応じて調整
+        }, 3000); // リセットの時間に応じて調整
       } else {
         // **失敗シナリオ**
         setStatus('');
@@ -159,7 +159,7 @@ export default function Stage1Client() {
         setTimeout(() => {
           setShowExplosion(false); // 爆発を非表示
           setAnimationCompleted(true);
-        }, 1000); // 爆発アニメーションの長さ
+        }, 500); // 爆発アニメーションの長さ
       }
     }
   };
@@ -294,6 +294,7 @@ export default function Stage1Client() {
         {/* 鼻毛の画像 */}
         {showHair && (
           <div
+            className="fade-in-scale"
             style={{
               position: 'absolute',
               top: '-150px', // 位置を上にずらす
@@ -323,7 +324,7 @@ export default function Stage1Client() {
           {isSuccess ? (
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                '毛タクさん沢山アゲてくよ！！ #鼻毛エクスプロージョン #RUNTEQ祭'
+                '毛タクさん沢山ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
               )}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} 
               target="_blank"
               rel="noopener noreferrer"
@@ -337,7 +338,7 @@ export default function Stage1Client() {
               onClick={handleRetry}
               className="retry-button bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded"
             >
-              毛ほしい？▷はい・いいえ
+              毛ほしい? ▷はい・いいえ
             </button>
           )}
         </div>
