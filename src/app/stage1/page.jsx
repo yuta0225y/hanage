@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const cottonBudImage = '/cotton-bud.png';
 const noseImage = '/nose.png';
-const hairImage = '/ke.png'; // 鼻毛の画像
+const hairImage = '/ke.png'; 
 
 export default function Stage1() {
   const [positionX, setPositionX] = useState(0); // 綿棒のX座標
@@ -28,13 +28,13 @@ export default function Stage1() {
   const cottonBudRef = useRef(null);
   const timerRef = useRef(null); // タイマーを管理するためのRef
 
-  // 綿棒の動き（難易度を上げるために速度を速くしました）
+  // 綿棒の動き
   useEffect(() => {
     if (!clicked && !resetting) {
       const moveInterval = 30; // 移動の間隔（ミリ秒）
       const step = 10; // 1回の移動量（ピクセル）
-      const minX = -200; // 中央から左に行く距離
-      const maxX = 200;  // 中央から右に行く距離
+      const minX = -130; // 中央から左に行く距離
+      const maxX = 130;  // 中央から右に行く距離
 
       const handleMovement = () => {
         setPositionX((prevX) => {
@@ -58,7 +58,7 @@ export default function Stage1() {
     }
   }, [direction, clicked, resetting]);
 
-  // 3秒以内にタップしないと爆発 & カウントダウンの表示
+  // 0.5秒以内にタップしないと爆発 & カウントダウンの表示
   useEffect(() => {
     if (!clicked && !animationCompleted) {
       setTimeLeft(0.5); // タイマーをリセット
