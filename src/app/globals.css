@@ -25,3 +25,18 @@ body {
     text-wrap: balance;
   }
 }
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.fade-in-scale {
+  animation: fadeInScale 1s ease-out forwards;
+}
