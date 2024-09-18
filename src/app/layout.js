@@ -15,26 +15,28 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "鼻毛エクスプロージョン",
-  description: "これは鼻毛ゲームの説明です。",
+  description: "爆破させずに鼻毛をぬいてみよ！",
   openGraph: {
-    url: 'https://hanage.vercel.app',
-    type: 'website',
+    title: "鼻毛エクスプロージョン",
+    description: "爆破させずに鼻毛をぬいてみよ！",
     images: [
       {
-        url: 'https://hanage.vercel.app/ogp-image.png',
+        url: "https://hanage.vercel.app/ogp-image.png",
         width: 1200,
         height: 630,
-        alt: '鼻毛ゲーム OGP画像',
       },
     ],
-    title: '鼻毛ゲーム - ホーム',
-    description: '鼻毛ゲームをお楽しみください。',
+    url: "https://hanage.vercel.app/",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: '鼻毛ゲーム - ホーム',
-    description: '鼻毛ゲームをお楽しみください。',
-    images: ['https://hanage.vercel.app/twitter-card.png'],
+    card: "summary_large_image",
+    title: "鼻毛エクスプロージョン",
+    description: "爆破させずに鼻毛をぬいてみよ！",
+    images: [
+      "https://hanage.vercel.app/ogp-image.png",
+    ],
+    url: "https://hanage.vercel.app/",
   },
 };
 
