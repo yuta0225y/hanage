@@ -312,17 +312,21 @@ export default function Stage1Client() {
         )}
       </div>
 
-      {/* リトライまたはシェアボタンのオーバーレイ */}
-      {animationCompleted && (
+ {/* リトライおよびシェアボタンのオーバーレイ */}
+ {animationCompleted && (
         <div className="overlay fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
           <p className="message text-4xl mb-4">
             {isSuccess ? '毛どうぞどうぞ' : 'きびしいって！'}
           </p>
-          {isSuccess ? (
+          <div className="flex space-x-4">
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                '毛タクさん沢山ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
-              )}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} 
+                isSuccess
+                  ? '毛タクさん沢山ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
+                  : '毛ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
+              )}&url=${encodeURIComponent(
+                typeof window !== 'undefined' ? window.location.href : ''
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -330,14 +334,13 @@ export default function Stage1Client() {
                 毛をシェアする
               </button>
             </a>
-          ) : (
             <button
               onClick={handleRetry}
               className="retry-button bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded"
             >
-              毛ほしい? ▷はい・いいえ
+              毛ほしい？ ▷はい いいえ
             </button>
-          )}
+          </div>
         </div>
       )}
     </div>
