@@ -34,32 +34,54 @@ export default function Stage1Client() {
   // 綿棒の動き
   useEffect(() => {
     if (!clicked && !resetting) {
-      const moveInterval = 30; // 移動の間隔（ミリ秒）
-      const step = 10; // 1回の移動量（ピクセル）
-      const minX = -130; // 中央から左に行く距離
-      const maxX = 130;  // 中央から右に行く距離
-
+      const minX = -250;
+      const maxX = 250;
+      const minY = -50;
+      const maxY = 100;
+  
+      // ランダムな間隔とステップ
+      const randomInterval = Math.random() * (50 - 20) + 20; // ランダムに20ms〜50msの間隔
+      const randomStepX = Math.random() * (20 - 10) + 10; // 横方向のランダムステップ
+      const randomStepY = Math.random() * (30 - 10) + 10; // 縦方向のランダムステップ
+  
       const handleMovement = () => {
-        setPositionX((prevX) => {
-          const nextX = prevX + step * direction;
-
-          if (nextX > maxX) {
-            setDirection(-1);
-            return maxX;
-          } else if (nextX < minX) {
-            setDirection(1);
-            return minX;
-          }
-
-          return nextX;
-        });
+        const shouldStop = Math.random() > 0.9; // 10%の確率で綿棒が止まる
+  
+        if (!shouldStop) {
+          // 横方向の動き（ランダム速度とランダムステップ）
+          setPositionX((prevX) => {
+            const nextX = prevX + randomStepX * direction;
+  
+            if (nextX > maxX) {
+              setDirection(-1); // 右端に達したら左へ
+              return maxX;
+            } else if (nextX < minX) {
+              setDirection(1); // 左端に達したら右へ
+              return minX;
+            }
+  
+            return nextX;
+          });
+  
+          // 縦方向の動き（ランダム速度とランダムステップ）
+          setPositionY((prevY) => {
+            const nextY = prevY + randomStepY * (Math.random() > 0.5 ? 1 : -1); // 上下にランダムに動く
+            if (nextY > maxY) return maxY;
+            if (nextY < minY) return minY;
+            return nextY;
+          });
+        }
       };
-
-      const intervalId = setInterval(handleMovement, moveInterval);
-
+  
+      // 定期的にランダムな動きの処理を行う
+      const intervalId = setInterval(handleMovement, randomInterval);
+  
       return () => clearInterval(intervalId);
     }
   }, [direction, clicked, resetting]);
+  
+  
+  
 
   // 0.5秒以内にタップしないと爆発 & カウントダウンの表示
   useEffect(() => {
@@ -169,7 +191,127 @@ export default function Stage1Client() {
       setClicked(true); // クリックを無効化
       clearTimeout(timerRef.current); // タイマーをクリア
       setTimeLeft(0); // カウントダウンを0に設定
-      const moveUpInterval = 50; // 移動の間隔（ミリ秒）
+      const moveUpInterval = 5;{/* 鼻毛の画像 */}
+      {showHair && (
+        <div
+          className={`${
+            showHair ? 'emerge-animation' : ''
+          } fade-in-scale`}
+          style={{
+            position: 'absolute',
+            top: '-180px', // 鼻の上に配置するように調整
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '300px', // 必要に応じて幅を調整
+            height: '300px', // 必要に応じて高さを調整
+            zIndex: 15, // 鼻より上に表示するようにする
+          }}
+        >
+          <Image
+            src={hairImage}
+            alt="鼻毛"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      )}{/* 鼻毛の画像 */}
+      {showHair && (
+        <div
+          className={`${
+            showHair ? 'emerge-animation' : ''
+          } fade-in-scale`}
+          style={{
+            position: 'absolute',
+            top: '-180px', // 鼻の上に配置するように調整
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '300px', // 必要に応じて幅を調整
+            height: '300px', // 必要に応じて高さを調整
+            zIndex: 15, // 鼻より上に表示するようにする
+          }}
+        >
+          <Image
+            src={hairImage}
+            alt="鼻毛"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      )}{/* 鼻毛の画像 */}
+      {showHair && (
+        <div
+          className={`${
+            showHair ? 'emerge-animation' : ''
+          } fade-in-scale`}
+          style={{
+            position: 'absolute',
+            top: '-180px', // 鼻の上に配置するように調整
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '300px', // 必要に応じて幅を調整
+            height: '300px', // 必要に応じて高さを調整
+            zIndex: 15, // 鼻より上に表示するようにする
+          }}
+        >
+          <Image
+            src={hairImage}
+            alt="鼻毛"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      )}{/* 鼻毛の画像 */}
+      {showHair && (
+        <div
+          className={`${
+            showHair ? 'emerge-animation' : ''
+          } fade-in-scale`}
+          style={{
+            position: 'absolute',
+            top: '-180px', // 鼻の上に配置するように調整
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '300px', // 必要に応じて幅を調整
+            height: '300px', // 必要に応じて高さを調整
+            zIndex: 15, // 鼻より上に表示するようにする
+          }}
+        >
+          <Image
+            src={hairImage}
+            alt="鼻毛"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      )}{/* 鼻毛の画像 */}
+      {showHair && (
+        <div
+          className={`${
+            showHair ? 'emerge-animation' : ''
+          } fade-in-scale`}
+          style={{
+            position: 'absolute',
+            top: '-180px', // 鼻の上に配置するように調整
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '300px', // 必要に応じて幅を調整
+            height: '300px', // 必要に応じて高さを調整
+            zIndex: 15, // 鼻より上に表示するようにする
+          }}
+        >
+          <Image
+            src={hairImage}
+            alt="鼻毛"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      )}0; // 移動の間隔（ミリ秒）
       const moveUpStep = 15; // 1回の移動量（ピクセル）
       const totalMoveUp = 115; // 合計移動量（ピクセル）
       let movedUp = 0; // 現在の移動量
@@ -290,18 +432,20 @@ export default function Stage1Client() {
           height={50}
           style={{ width: 'auto', height: 'auto' }}
         />
-
         {/* 鼻毛の画像 */}
         {showHair && (
           <div
-            className="fade-in-scale"
+            className={`${
+              showHair ? 'emerge-animation' : ''
+            } fade-in-scale`}
             style={{
               position: 'absolute',
-              top: '-150px', // 位置を上にずらす
+              top: '-140px', // 鼻の上に配置するように調整
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '300px', // 幅を大きく
-              height: '300px', // 高さを大きく
+              width: '300px', // 必要に応じて幅を調整
+              height: '300px', // 必要に応じて高さを調整
+              zIndex: 20, // 鼻より上に表示するようにする
             }}
           >
             <Image
@@ -315,34 +459,36 @@ export default function Stage1Client() {
         )}
       </div>
 
-      {/* リトライまたはシェアボタンのオーバーレイ */}
-      {animationCompleted && (
-        <div className="overlay fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
-          <p className="message text-4xl mb-4">
-            {isSuccess ? '毛どうぞどうぞ' : 'きびしいって！'}
-          </p>
-          {isSuccess ? (
-            <a
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                '毛タクさん沢山ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
-              )}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} 
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="share-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">
-                毛をシェアする
-              </button>
-            </a>
-          ) : (
-            <button
-              onClick={handleRetry}
-              className="retry-button bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded"
-            >
-              毛ほしい? ▷はい・いいえ
-            </button>
-          )}
-        </div>
-      )}
+    {/* リトライまたはシェアボタンのオーバーレイ */}
+    {animationCompleted && (
+      <div className="overlay fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
+        <p className="message text-4xl mb-4">
+          {isSuccess ? '毛どうぞどうぞ' : 'きびしいって！'}
+        </p>
+        {/* Xシェアボタン */}
+        <a
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+            isSuccess
+             ? '毛タクさん沢山ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
+             : '毛ほしい？ #鼻毛エクスプロージョン #RUNTEQ祭'
+          )}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} 
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="share-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">
+            毛をシェアする
+          </button>
+        </a>
+
+        {/* リトライボタン */}
+        <button
+          onClick={handleRetry}
+          className="retry-button bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded mt-4"
+        >
+          毛ほしい? ▷はい・いいえ
+        </button>
+      </div>
+    )}
     </div>
   );
 }
