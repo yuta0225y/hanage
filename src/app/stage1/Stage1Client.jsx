@@ -1,6 +1,3 @@
-
-// src/app/stage1/Stage1Client.jsx
-
 "use client";
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
